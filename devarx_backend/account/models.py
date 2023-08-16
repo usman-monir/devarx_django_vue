@@ -9,6 +9,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True, blank=False)
     name = models.CharField(max_length=255, default='', blank=True, null=True)
     avatar = models.ImageField(upload_to='avatars', blank=True, null=True)
+    friends = models.ManyToManyField('self', blank=True)
 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -22,3 +23,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     EMAIL_FIELD = 'email'
     REQUIRED_FIELDS = []
+
+
+class FriendRequest(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    send_by = models.ForeignKey(User, related_name='friend_requests_sendby', on_delete=models.CASCADE)
+    send_to = models.ForeignKey(User, related_name='friend_requests_sendto', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
