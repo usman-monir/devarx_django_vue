@@ -3,8 +3,19 @@
                     <div class="mb-6 flex items-center justify-between">
                         <div class="flex items-center space-x-6">
                             <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] rounded-full">
-                            <RouterLink :to="{ name: 'profile', params: { 'id': post.created_by.id } }"><strong
-                    class="text-purple-600">{{ post.created_by.name }}</strong></RouterLink>
+                        <template v-if="current_user_id == post.created_by.id">
+                            <p><strong>{{  post.created_by.name }}</strong></p>
+                        </template>
+                        <template v-else-if="profileViewPage">
+                            <p><strong>{{  post.created_by.name }}</strong></p>
+                        </template>
+                        <template v-else>
+                            <RouterLink :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
+                                <strong
+                                    class="text-purple-600">{{ post.created_by.name }}
+                                </strong>
+                            </RouterLink>
+                        </template>
                         </div>
 
                         <p class="text-gray-600">{{ post.created_at_formatted  }} ago</p>
@@ -43,7 +54,9 @@
 <script>
 export default {
     props: {
-        post: Object
+        post: Object,
+        current_user_id: String,
+        profileViewPage: Boolean,
     }
 }
 </script>

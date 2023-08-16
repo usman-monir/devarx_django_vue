@@ -53,7 +53,7 @@
                 </div>
             </div> -->
             <template v-for="post in posts" :key="post.id">
-                <PostItem :post="post"/>
+                <PostItem :post="post" :current_user_id="userStore.user.id"/>
             </template>
         </div>
 
@@ -70,6 +70,7 @@ import PostItem from '../components/PostItem.vue';
 import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
 import Trends from '@/components/Trends.vue';
 import { useToastStore } from '@/stores/toast';
+import { useUserStore } from '@/stores/user';
 
 export default{
     name: 'FeedView',
@@ -81,8 +82,10 @@ export default{
     setup()
     {
         const toastStore = useToastStore()
+        const userStore = useUserStore()
         return{
-            toastStore
+            toastStore,
+            userStore
         }
     },
     data() {

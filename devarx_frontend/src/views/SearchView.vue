@@ -11,23 +11,13 @@
                     </div>
                 </form>
             </div>
-            <div v-if="users.length" v-for="user in users" :key="user.id" class="p-4 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-5">
-                <div  class="p-6 text-center bg-gray-100 rounded-lg" >
-                <img src="https://i.pravatar.cc/300?img=67" class="mb-6 rounded-full">
-
-                    <RouterLink :to="{ name: 'profile', params: { 'id': user.id } }"><strong class="text-purple-600 underline">{{
-                        user.name }}</strong></RouterLink>
-                    <br />
-                    <small>{{ user.email }}</small>
-
-                    <div class="mt-6 flex space-x-8 justify-around">
-                        <p class="text-xs text-gray-500">182 friends</p>
-                        <p class="text-xs text-gray-500">120 posts</p>
-                    </div>
+            <div v-if="users.length" class="p-6 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-4">
+                <div v-for="user in users" :key="user.id">
+                <UserCard :user="user" :current_user_id="userStore.user.id" />
                 </div>
             </div>
             <div v-if="posts.length" v-for="post in posts" :key="post.id">
-                <PostItem :post="post" />
+                <PostItem :post="post" :current_user_id="userStore.user.id"  />
             </div>
         </div>
         <div class="main-right col-span-1 space-y-4">
@@ -42,7 +32,9 @@ import { RouterLink } from 'vue-router';
 import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
 import Trends from '../components/Trends.vue'
 import PostItem from '../components/PostItem.vue';
+import UserCard from '../components/UserCard.vue';
 import { useToastStore } from '@/stores/toast';
+import { useUserStore } from '@/stores/user';
 import axios from 'axios'
 
 export default {
@@ -52,11 +44,14 @@ export default {
         PostItem,
         Trends,
         RouterLink,
+        UserCard,
     },
     setup() {
         const toastStore = useToastStore()
+        const userStore = useUserStore()
         return {
-            toastStore
+            toastStore,
+            userStore,
         }
     },
     data() {
