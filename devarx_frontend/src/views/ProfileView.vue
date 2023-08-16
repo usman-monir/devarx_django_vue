@@ -1,7 +1,20 @@
 <template>
-    <div class="max-w-7xl mx-auto grid grid-cols-3 gap-4">
+    <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
+        <div class="main-left col-span-1">
+            <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
+                <img src="https://i.pravatar.cc/300?img=67" class="mb-6 rounded-full">
+
+                <p><strong>{{ user.name }}</strong></p>
+
+                <div class="mt-6 flex space-x-8 justify-around">
+                    <p class="text-xs text-gray-500">182 friends</p>
+                    <p class="text-xs text-gray-500">120 posts</p>
+                </div>
+            </div>
+        </div>
+
         <div class="main-center col-span-2 space-y-4">
-            <div class="bg-white border border-gray-200 rounded-lg">
+            <div v-if="userStore.user.id == user.id" class="bg-white border border-gray-200 rounded-lg">
                 <div class="p-4">
                     <textarea v-model="postData.body" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"></textarea>
                 </div>
@@ -66,13 +79,14 @@
 
 <script>
 import axios from 'axios';
-import PostItem from '../components/PostItem.vue';
 import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
+import PostItem from '../components/PostItem.vue';
 import Trends from '@/components/Trends.vue';
 import { useToastStore } from '@/stores/toast';
+import { useUserStore } from '@/stores/user';
 
 export default{
-    name: 'FeedView',
+    name: 'ProfileView',
     components: {
         PeopleYouMayKnow,
         PostItem,
@@ -81,8 +95,10 @@ export default{
     setup()
     {
         const toastStore = useToastStore()
+        const userStore = useUserStore()
         return{
-            toastStore
+           'toastStore': toastStore,
+           'userStore': userStore
         }
     },
     data() {
@@ -90,23 +106,36 @@ export default{
             posts:[],
             postData:{
                 'body': ''
-            }
+            },
+            user:{}
+        } 
+    },
+    watch:{
+        "$route.params.id":{
+            handler()
+            {
+                this.loadPosts()
+            },
+            deep: true,
+            immediate: true,
         }
     },
-    mounted(){
-        this.loadPosts()
-    },
+
     methods:{
-        loadPosts()
+        async loadPosts()
         {
-            axios
-            .get('/api/posts/')
+            await axios
+            .get(`/api/posts/profile/${this.$route.params.id}/`)
             .then(response=>{
+                console.log(response);
                 this.posts = response.data.posts
+                this.user = response.data.user
                 console.log(this.posts);
+                console.log(this.user);
         })
         .catch(err => this.toastStore.showToast(5000,err, 'bg-red-300'))
        },
+
        createPost()
        {
             axios
