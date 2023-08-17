@@ -11,6 +11,7 @@
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
                 <button v-if="user && user.id != userStore.user.id && !isAlreadyFriend"  @click.prevent="sendFriendRequest" class="inline-block mt-4 py-3 px-3 bg-purple-600 text-white text-xs rounded-md">Send Friend Request</button>
+                <button v-if="user && user.id != userStore.user.id && isAlreadyFriend"  @click.prevent="unFriend" class="inline-block mt-4 py-3 px-3 bg-red-600 text-white text-xs rounded-md">UnFriend</button>
             </div>
         </div>
 
@@ -118,9 +119,19 @@ export default{
        sendFriendRequest()
        {
             axios
-            .post('/api/user/SendfriendRequest/', {'id' : this.user.id} )
+            .post('/api/user/sendFriendRequest/', {'id' : this.user.id} )
             .then(response =>{
                 this.toastStore.showToast(5000,response.data.status, 'bg-emerald-300')
+            })
+            .catch(error => this.toastStore.showToast(5000,error,'bg-red-300'))
+       },
+       unFriend()
+       {
+            axios
+            .post('/api/user/unFriend/', {'id' : this.user.id} )
+            .then(response =>{
+                this.toastStore.showToast(5000,response.data.status, 'bg-emerald-300')
+                this.isAlreadyFriend = 0
             })
             .catch(error => this.toastStore.showToast(5000,error,'bg-red-300'))
        }

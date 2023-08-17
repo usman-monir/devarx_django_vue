@@ -13,7 +13,7 @@
             </div>
             <div v-if="users.length" class="p-6 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-4">
                 <div v-for="user in users" :key="user.id">
-                <UserCard :user="user" :current_user_id="userStore.user.id" />
+                    <UserCard :user="user" :current_user_id="userStore.user.id" />
                 </div>
             </div>
             <div v-if="posts.length" v-for="post in posts" :key="post.id">

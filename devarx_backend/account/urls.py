@@ -5,7 +5,8 @@ from . import api
 
 urlpatterns = [
     path('user/', api.user, name='user'),
-    path('user/SendfriendRequest/', api.sendFriendRequest, name='sendFriendRequest'),
+    path('user/sendFriendRequest/', api.sendFriendRequest, name='sendFriendRequest'),
+    path('user/unFriend/', api.unFriend, name='unFriend'),
     path('user/friends/me/', api.getCurrentUserFriendsData, name='getCurrentUserFriendsData'),
     path('user/friends/viewed/<uuid:user_id>/', api.getViewedUserFriendsData, name='getViewedUserFriendsData'),
     path('user/friends/accept', api.acceptFriendRequest, name='acceptFriendRequest'),

@@ -34,6 +34,7 @@
             <div v-else>
                 <p class="text-gray-500 p-5"> No Friends yet! :( </p>
             </div>
+            <template v-if="$route.params.id != userStore.user.id">
             <h1 class="font-bold mt-6 p-5 bg-white text-gray-700 rounded-full ">Mutual Friends</h1>
             <div v-if="mutualFriends.length" class="p-6 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-4">
                 <AllFriends :friends="mutualFriends" />
@@ -41,6 +42,7 @@
             <div v-else>
                 <p class="text-gray-500 p-5"> No Mutual Friends to show! </p>
             </div>
+            </template>
         </div>
         <div class="main-right col-span-1 space-y-4">
             <PeopleYouMayKnow />
@@ -93,6 +95,13 @@ export default {
         else
             this.getViewedUserFriendsData()
     },
+    beforeUpdate()
+    {
+        if(this.$route.params.id == this.userStore.user.id )
+            this.getCurrentUserFriendsData()
+        else
+            this.getViewedUserFriendsData()
+    },
     methods: {
         getCurrentUserFriendsData() {
             axios
@@ -120,9 +129,6 @@ export default {
                 this.toastStore.showToast(3000, response.data.status, 'bg-emerald-300')
             })
             .catch(error => this.toastStore.showToast(3000, error, 'bg-red-300'))
-            setTimeout(()=>{
-                this.getCurrentUserFriendsData()
-            }, 3000)
         },
         rejectRequest(id){
             axios
@@ -131,9 +137,6 @@ export default {
                 this.toastStore.showToast(3000, response.data.status, 'bg-red-300')
             })
             .catch(error => this.toastStore.showToast(3000, error, 'bg-red-300'))
-            setTimeout(()=>{
-                this.getCurrentUserFriendsData()
-            }, 3000)
         }
     }
 }

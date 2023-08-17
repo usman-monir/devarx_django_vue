@@ -50,6 +50,15 @@ def sendFriendRequest(request):
         return JsonResponse({'status': 'request sent!'})
 
 
+@api_view(['POST'])
+def unFriend(request):
+    user_id = request.data.get('id')
+    user = User.objects.get(pk=user_id)
+    request.user.friends.remove(user)
+    user.friends.remove(request.user)
+    return JsonResponse({'status': 'Removed from friends list!'})
+
+
 @api_view(['GET'])
 def getCurrentUserFriendsData(request):
     requests = FriendRequest.objects.filter(send_to=request.user)

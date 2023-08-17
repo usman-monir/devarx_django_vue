@@ -30,3 +30,6 @@ class FriendRequest(models.Model):
     send_by = models.ForeignKey(User, related_name='friend_requests_sendby', on_delete=models.CASCADE)
     send_to = models.ForeignKey(User, related_name='friend_requests_sendto', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self) -> str:
+        return self.send_by.email + ' -> ' + self.send_to.email
