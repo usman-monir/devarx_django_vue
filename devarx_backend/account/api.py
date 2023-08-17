@@ -51,7 +51,7 @@ def sendFriendRequest(request):
 
 
 @api_view(['GET'])
-def friends(request):
+def getCurrentUserFriendsData(request):
     requests = FriendRequest.objects.filter(send_to=request.user)
     friends = request.user.friends.all()
     requests= RequestsSerializer(requests, many=True)
@@ -82,5 +82,15 @@ def rejectFriendRequest(request):
     friendRequest1.delete()
     if friendRequest2:
         friendRequest2.delete()
-        
+
     return JsonResponse({'status': 'Removed from the friend requests!'})
+
+
+@api_view(['GET'])
+def getViewedUserFriendsData(request, user_id):
+    user = User.objects.get(pk=user_id)
+    friends = user.friends.all()
+    mutualFriends = request.user.friends.filter(pk__in=friends)
+    friends = UserSerializer(friends, many=True)
+    mutualFriends = UserSerializer(mutualFriends, many=True)
+    return JsonResponse({'friends': friends.data, 'mutualFriends': mutualFriends.data })
