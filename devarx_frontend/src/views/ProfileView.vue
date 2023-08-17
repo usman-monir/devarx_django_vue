@@ -7,7 +7,7 @@
                 <p><strong>{{ user.name }}</strong></p>
 
                 <div class="mt-6 flex space-x-8 justify-around">
-                    <RouterLink :to="{name: 'friends'}" class="text-xs text-gray-500">{{this.friendsCount}} friends</RouterLink>
+                        <RouterLink :to="{name: 'friends'}" class="text-xs text-gray-500">{{this.friendsCount}} friends</RouterLink>
                     <p class="text-xs text-gray-500">120 posts</p>
                 </div>
                 <button v-if="user && user.id != userStore.user.id && !isAlreadyFriend"  @click.prevent="sendFriendRequest" class="inline-block mt-4 py-3 px-3 bg-purple-600 text-white text-xs rounded-md">Send Friend Request</button>
