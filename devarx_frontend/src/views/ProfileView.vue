@@ -87,9 +87,9 @@ export default{
         }
     },
     methods:{
-        async loadPosts()
+        loadPosts()
         {
-            await axios
+            axios
             .get(`/api/posts/profile/${this.$route.params.id}/`)
             .then(response=>{
                 console.log(response);

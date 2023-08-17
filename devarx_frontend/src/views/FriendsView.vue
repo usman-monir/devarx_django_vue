@@ -29,7 +29,7 @@
         </template>
             <h1 class="font-bold mt-6 p-5 bg-white text-gray-700 rounded-full ">All Friends</h1>
             <div v-if="friends.length" class="p-6 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-4">
-                <AllFriends :friends="friends" />
+                <AllFriends :friends="friends" :current_user_id="userStore.user.id"/>
             </div>
             <div v-else>
                 <p class="text-gray-500 p-5"> No Friends yet! :( </p>
@@ -89,13 +89,6 @@ export default {
     }
     ,
     mounted()
-    {
-        if(this.$route.params.id == this.userStore.user.id )
-            this.getCurrentUserFriendsData()
-        else
-            this.getViewedUserFriendsData()
-    },
-    beforeUpdate()
     {
         if(this.$route.params.id == this.userStore.user.id )
             this.getCurrentUserFriendsData()

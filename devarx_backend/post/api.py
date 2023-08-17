@@ -8,7 +8,10 @@ from .serializers import PostSerializer, UserSerializer
 
 @api_view(['GET'])
 def allPosts(request):
-    posts = Post.objects.all()
+    all_users_ids = [str(request.user.id)]
+    for user in request.user.friends.all():
+        all_users_ids.append(str(user.id))
+    posts = Post.objects.filter(created_by_id__in=all_users_ids)
     serializedPosts = PostSerializer(posts, many=True)
     return JsonResponse({'posts': serializedPosts.data})
 

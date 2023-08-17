@@ -15,7 +15,7 @@
                             </svg>
                         </RouterLink>
 
-                        <RouterLink to="message">
+                        <RouterLink to="/message">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
                                 stroke="currentColor" class="w-6 h-6">
                                 <path stroke-linecap="round" stroke-linejoin="round"
@@ -41,13 +41,42 @@
                             </svg>
                         </RouterLink>
                     </div>
-                    <div class="flex menu-right">
-                        <p class="mr-3 mt-2">{{ this.userStore.user.name }}</p>
-                        <RouterLink :to="{ name: 'profile', params: { 'id': userStore.user.id } }">
-                            <img src="https://i.pravatar.cc/40?img=62" class="rounded-full">
-                        </RouterLink>
+                    <!-- <p class="mr-3 mt-2">{{ this.userStore.user.name }}</p>
+                    <RouterLink :to="{ name: 'profile', params: { 'id': userStore.user.id } }">
+                        <img src="https://i.pravatar.cc/40?img=62" class="rounded-full">
+                    </RouterLink> -->
 
+                <div class="flex menu-right">
+                    <button id="dropdownMenuButton" @click.prevent="toggleMenu" class="flex items-center text-sm font-medium rounded-full text-purple-800 md:mr-0" type="button">
+                        <img class="w-8 h-8 mr-2 rounded-full" src="https://i.pravatar.cc/40?img=62" alt="user photo">
+                        {{ userStore.user.name }}
+                        <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
+                    </svg>
+                    </button>
+
+                    <!-- Dropdown menu -->
+                    <div id="dropdownMenu" class="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 dark:divide-gray-600" style="position: absolute;margin-top: 50px; display: none;">
+                        <div class="px-4 py-3 text-sm text-gray-900 dark:text-white">
+                        <div class="truncate">{{ userStore.user.email }}</div>
+                        </div>
+                        <ul class="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownInformdropdownAvatarNameButtonationButton">
+                        <li>
+                            <a href="/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Home</a>
+                        </li>
+                        <li>
+                            <RouterLink  :to="{ name: 'profile', params: { 'id': userStore.user.id || 0 } }" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Profile</RouterLink>
+                        </li>
+                        <li>
+                            <a href="/search" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Search</a>
+                        </li>
+                        </ul>
+                        <div class="py-2">
+                        <a @click.prevent="logout" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Log out</a>
+                        </div>
                     </div>
+                </div>
+
                 </template>
                 <template v-else>
                     <div class="menu-right">
@@ -86,6 +115,22 @@ export default
             this.userStore.initStore()
             const token = this.userStore.user.access || ''
             axios.defaults.headers.common['Authorization'] = "Bearer " + token
+        }
+        ,
+        methods:{
+            logout()
+            {
+                this.userStore.removeToken()
+                this.$router.push('/login')
+            },
+            toggleMenu()
+            {
+                const dropdownMenu = document.getElementById('dropdownMenu')
+                if (dropdownMenu.style.display == 'none')
+                    dropdownMenu.style.display = 'block'
+                else
+                    dropdownMenu.style.display = 'none'
+            }
         }
     }
 </script>

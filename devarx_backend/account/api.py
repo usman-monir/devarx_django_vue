@@ -71,7 +71,6 @@ def getCurrentUserFriendsData(request):
 @api_view(['POST'])
 def acceptFriendRequest(request):
     user = User.objects.get(pk=request.data.get('id'))
-    print(user)
     request.user.friends.add(user)
     friendRequest1 = FriendRequest.objects.filter(Q(send_by=user) & Q(send_to=request.user))
     friendRequest2 = FriendRequest.objects.filter(Q(send_by=request.user) & Q(send_to=user))
@@ -85,7 +84,6 @@ def acceptFriendRequest(request):
 @api_view(['POST'])
 def rejectFriendRequest(request):
     user = User.objects.get(pk=request.data.get('id'))
-    print(user)
     friendRequest1 = FriendRequest.objects.filter(Q(send_by=user) & Q(send_to=request.user))
     friendRequest2 = FriendRequest.objects.filter(Q(send_by=request.user) & Q(send_to=user))
     friendRequest1.delete()
