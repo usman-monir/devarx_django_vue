@@ -37,3 +37,19 @@ def getUserPosts(request, id):
     serializedPosts = PostSerializer(posts, many=True)
     serializedUser = UserSerializer(user)
     return JsonResponse({'posts': serializedPosts.data, 'user': serializedUser.data})
+
+
+@api_view(['POST'])
+def likePost(request, id):
+    post = Post.objects.get(pk=request.data.get('postId'))
+    post.likes.add(request.user)
+    post.save()
+    return JsonResponse({'status': 'Liked'})
+
+
+@api_view(['POST'])
+def dislikePost(request, id):
+    post = Post.objects.get(pk=request.data.get('postId'))
+    post.likes.remove(request.user)
+    post.save()
+    return JsonResponse({'status': 'DisLiked'})

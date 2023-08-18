@@ -24,7 +24,7 @@
             </div>
             </template>
             <template v-else>
-                <p class="text-gray-500 p-5"> No Friend Requests :( </p>
+                <p class="text-gray-500 p-5"> No Friend Requests! </p>
             </template>
         </template>
             <h1 class="font-bold mt-6 p-5 bg-white text-gray-700 rounded-full ">All Friends</h1>
@@ -32,7 +32,7 @@
                 <AllFriends :friends="friends" :current_user_id="userStore.user.id"/>
             </div>
             <div v-else>
-                <p class="text-gray-500 p-5"> No Friends yet! :( </p>
+                <p class="text-gray-500 p-5"> No Friends yet! </p>
             </div>
             <template v-if="$route.params.id != userStore.user.id">
             <h1 class="font-bold mt-6 p-5 bg-white text-gray-700 rounded-full ">Mutual Friends</h1>

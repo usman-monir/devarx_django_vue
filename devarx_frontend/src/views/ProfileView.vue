@@ -7,8 +7,8 @@
                 <p><strong>{{ user.name }}</strong></p>
 
                 <div class="mt-6 flex space-x-8 justify-around">
-                        <RouterLink :to="{name: 'friends'}" class="text-xs text-gray-500">{{this.friendsCount}} friends</RouterLink>
-                    <p class="text-xs text-gray-500">120 posts</p>
+                        <RouterLink :to="{name: 'friends'}" class="text-xs text-gray-500 underline">{{this.friendsCount}} friends</RouterLink>
+                    <p class="text-xs text-gray-500">{{ totalPosts }} posts</p>
                 </div>
                 <button v-if="user && user.id != userStore.user.id && !isAlreadyFriend"  @click.prevent="sendFriendRequest" class="inline-block mt-4 py-3 px-3 bg-purple-600 text-white text-xs rounded-md">Send Friend Request</button>
                 <button v-if="user && user.id != userStore.user.id && isAlreadyFriend"  @click.prevent="unFriend" class="inline-block mt-4 py-3 px-3 bg-red-600 text-white text-xs rounded-md">UnFriend</button>
@@ -42,7 +42,7 @@
 <script>
 import axios from 'axios';
 import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
-import PostItem from '../components/PostItem.vue';
+import PostItem from '@/components/PostItem.vue';
 import Trends from '@/components/Trends.vue';
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
@@ -74,6 +74,7 @@ export default{
             user:{},
             isAlreadyFriend: 0,
             friendsCount: 0,
+            totalPosts : 0,
         }
     },
     watch:{
@@ -92,15 +93,13 @@ export default{
             axios
             .get(`/api/posts/profile/${this.$route.params.id}/`)
             .then(response=>{
-                console.log(response);
                 this.posts = response.data.posts
                 this.user = response.data.user
-                console.log(this.posts);
-                console.log(this.user);
                 this.isAlreadyFriend = this.user.friends.filter((id) => this.userStore.user.id == id).length
                 this.friendsCount = this.user.friends.length
+                this.totalPosts = this.posts.length
         })
-        .catch(err => this.toastStore.showToast(5000,err, 'bg-red-300'))
+        .catch(err => console.log(err))
        },
        createPost()
        {
@@ -134,7 +133,7 @@ export default{
                 this.isAlreadyFriend = 0
             })
             .catch(error => this.toastStore.showToast(5000,error,'bg-red-300'))
-       }
+       },
 }
 
 }

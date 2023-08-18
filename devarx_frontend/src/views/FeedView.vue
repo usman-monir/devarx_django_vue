@@ -66,7 +66,7 @@
 
 <script>
 import axios from 'axios';
-import PostItem from '../components/PostItem.vue';
+import PostItem from '@/components/PostItem.vue';
 import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
 import Trends from '@/components/Trends.vue';
 import { useToastStore } from '@/stores/toast';
@@ -106,7 +106,6 @@ export default{
             .get('/api/posts/')
             .then(response=>{
                 this.posts = response.data.posts
-                console.log(this.posts);
         })
         .catch(err => this.toastStore.showToast(5000,err, 'bg-red-300'))
        },
@@ -125,7 +124,5 @@ export default{
             .catch(error => this.toastStore.showToast(5000,error,'bg-red-300'))
        }
 }
-
 }
-
 </script>
