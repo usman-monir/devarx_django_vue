@@ -3,40 +3,39 @@
         <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center space-x-6">
                 <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] rounded-full">
-                <template v-if="current_user_id == post.created_by.id">
-                    <p><strong>{{ post.created_by.name }}</strong></p>
+                <template v-if="current_user_id == mutablePost.created_by.id">
+                    <p><strong>{{ mutablePost.created_by.name }}</strong></p>
                 </template>
                 <template v-else-if="profileViewPage">
-                    <p><strong>{{ post.created_by.name }}</strong></p>
+                    <p><strong>{{ mutablePost.created_by.name }}</strong></p>
                 </template>
                 <template v-else>
-                    <RouterLink :to="{ name: 'profile', params: { 'id': post.created_by.id } }">
-                        <strong class="text-purple-600">{{ post.created_by.name }}
+                    <RouterLink :to="{ name: 'profile', params: { 'id': mutablePost.created_by.id } }">
+                        <strong class="text-purple-600">{{ mutablePost.created_by.name }}
                         </strong>
                     </RouterLink>
                 </template>
             </div>
 
-            <p class="text-gray-600">{{ post.created_at_formatted }} ago</p>
+            <p class="text-gray-600">{{ mutablePost.created_at_formatted }} ago</p>
         </div>
 
-        <p>{{ post.body }}</p>
+        <p>{{ mutablePost.body }}</p>
 
         <div class="mb-6 mt-8 flex justify-between">
             <div class="flex space-x-6">
                 <div class="flex items-end space-x-2" style="cursor: pointer;">
-                    <svg @click.prevent="reactOnPost" :id="post.id + '-likeBtn'" xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6" :style="{'fill':fillValue}">
+                    <svg @click.prevent="reactOnPost" :id="mutablePost.id + '-likeBtn'" xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
                         <path stroke-linecap="round" stroke-linejoin="round"
                             d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z">
                         </path>
                     </svg>
-                    <span @click.prevent="usersWhoLiked" class="text-gray-500 text-xs mb-1 underline">{{ post.likes.length }} likes</span>
-                    <div :id="post.id + '-likesDropdown'"
+                    <span @click.prevent="usersWhoLiked" class="text-gray-500 text-xs mb-1 underline">{{ likesCount }} likes</span>
+                    <div :id="mutablePost.id + '-likesDropdown'"
                         class="z-10 bg-gray-100 rounded-lg shadow w-44"
                         style="display: none;position: relative;bottom: 30px;right: 50px;overflow-y: auto;max-height: 150px;min-height: 50px">
                         <ul class="py-2 text-sm text-gray-700">
-                            <template v-if="post.likes.length == 0"><p class="block px-4 py-2 text-gray-500">No likes yet!</p></template>
                         </ul>
                     </div>
                 </div>
@@ -66,26 +65,25 @@ export default {
     data()
     {
         return{
-            fillValue: 'none',
+            likesCount: 0,
+            mutablePost: JSON.parse( JSON.stringify(this.post))
         }
     },
     beforeMount()
     {
-        this.fillValue = this.getfillValue()
+        this.likesCount = this.mutablePost.likes.length
+    },
+    mounted()
+    {
+        const likeBtn = document.getElementById(this.mutablePost.id + '-likeBtn')
+        likeBtn.style.fill = this.getfillValue()
+        this.getUsersWhoLiked()
     },
     methods: {
         usersWhoLiked() {
-            const dropdownMenu= document.getElementById(this.post.id + '-likesDropdown')
+            const dropdownMenu= document.getElementById(this.mutablePost.id + '-likesDropdown')
             if ( dropdownMenu.style.display=='none' )
                 {
-                    this.post.likes.map(likedBy => {
-                        dropdownMenu.querySelector('ul').innerHTML += `
-
-                            <li class='flex items-center justify-start px-2 py-2 hover:bg-white'>
-                                <img class="w-8 h-8 mr-4 rounded-full" src="https://i.pravatar.cc/40?img=62" alt="user photo">
-                                <a href="/profile/${likedBy.id}" class="block"><small>${likedBy.name}</small></a>
-                            </li>`
-                    })
                 dropdownMenu.style.display = 'block'
                 }
             else
@@ -93,35 +91,60 @@ export default {
         },
         getfillValue()
         {
-            for ( let i = 0; i < this.post.likes.length; i++){
-                if ( this.post.likes[i].id == this.current_user_id)
+            for ( let i = 0; i < this.mutablePost.likes.length; i++){
+                if ( this.mutablePost.likes[i].id == this.current_user_id)
                     return 'purple'
             }
             return 'none'
         },
         async reactOnPost()
        {
-
-            const likeBtn = document.getElementById(this.post.id + '-likeBtn')
+            const likeBtn = document.getElementById(this.mutablePost.id + '-likeBtn')
             if (likeBtn.style.fill == 'none')
             {
                 await axios
-                .post(`/api/posts/profile/${this.post.created_by.id}/likePost/`, { 'postId': this.post.id})
+                .post(`/api/posts/profile/${this.mutablePost.created_by.id}/likePost/`, { 'postId': this.mutablePost.id})
                 .then(response => {
                     likeBtn.style.fill = 'purple';
+                    this.likesCount++;
+                    this.mutablePost = response.data.post
+                    console.log(this.mutablePost);
                 })
                 .catch(err => alert(err))
             }
             else
             {
                 await axios
-                .post(`/api/posts/profile/${this.post.created_by.id}/dislikePost/`, { 'postId': this.post.id})
+                .post(`/api/posts/profile/${this.mutablePost.created_by.id}/dislikePost/`, { 'postId': this.mutablePost.id})
                 .then(response => {
                     likeBtn.style.fill = 'none';
+                    this.likesCount--;
+                    this.mutablePost = response.data.post
+                    console.log(this.mutablePost);
                 })
                 .catch(err => alert(err))
             }
+            this.getUsersWhoLiked()
+       },
+       getUsersWhoLiked()
+       {
+        const dropdownMenu= document.getElementById(this.mutablePost.id + '-likesDropdown').querySelector('ul')
+        dropdownMenu.innerHTML = ''
+        if (this.mutablePost.likes.length == 0)
+        {
+            dropdownMenu.innerHTML += `<p class="block px-4 py-2 text-gray-500">No likes yet!</p>`
+        }
+        else
+        {
+        this.mutablePost.likes.map(likedBy => {
+                        dropdownMenu.innerHTML += `
+                            <li class='flex items-center justify-start px-2 py-2 hover:bg-white'>
+                                <img class="w-8 h-8 mr-4 rounded-full" src="https://i.pravatar.cc/40?img=62" alt="user photo">
+                                <a href="/profile/${likedBy.id}" class="block"><small>${likedBy.name}</small></a>
+                            </li>`
+                    })
        }
+    }
     }
 }
 </script>

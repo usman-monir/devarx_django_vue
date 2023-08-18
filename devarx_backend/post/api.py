@@ -44,7 +44,8 @@ def likePost(request, id):
     post = Post.objects.get(pk=request.data.get('postId'))
     post.likes.add(request.user)
     post.save()
-    return JsonResponse({'status': 'Liked'})
+    post = PostSerializer(post)
+    return JsonResponse({'post': post.data})
 
 
 @api_view(['POST'])
@@ -52,4 +53,5 @@ def dislikePost(request, id):
     post = Post.objects.get(pk=request.data.get('postId'))
     post.likes.remove(request.user)
     post.save()
-    return JsonResponse({'status': 'DisLiked'})
+    post = PostSerializer(post)
+    return JsonResponse({'post': post.data})
