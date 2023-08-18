@@ -73,3 +73,31 @@ def comment(request, id):
     return JsonResponse({'post': {}})
 
 
+@api_view(['POST'])
+def deleteComment(request, id):
+    postId = request.data.get('postId')
+    commentId = request.data.get('commentId')
+    post = Post.objects.get(pk=postId)
+    comment = post.comments.get(pk=commentId)
+    if comment:
+        post.comments.remove(comment)
+        post.save()
+        post = PostSerializer(post)
+        return JsonResponse({'post': post.data})
+    return JsonResponse({'post': {}})
+
+
+@api_view(['POST'])
+def editComment(request, id):
+    postId = request.data.get('postId')
+    commentBody = request.data.get('body')
+    commentId = request.data.get('commentId')
+    post = Post.objects.get(pk=postId)
+    post.comments.filter(pk=commentId).update(body=commentBody)
+    post.save()
+    post = PostSerializer(post)
+    return JsonResponse({'post': post.data})
+
+
+
+
