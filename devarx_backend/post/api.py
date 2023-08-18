@@ -1,5 +1,5 @@
 from rest_framework.decorators import api_view, authentication_classes
-from .models import Post
+from .models import Post, Comment
 from account.models import User
 from .forms import CreatePostForm
 from django.http import JsonResponse
@@ -41,7 +41,8 @@ def getUserPosts(request, id):
 
 @api_view(['POST'])
 def likePost(request, id):
-    post = Post.objects.get(pk=request.data.get('postId'))
+    postId = request.data.get('postId')
+    post = Post.objects.get(pk=postId)
     post.likes.add(request.user)
     post.save()
     post = PostSerializer(post)
@@ -50,8 +51,25 @@ def likePost(request, id):
 
 @api_view(['POST'])
 def dislikePost(request, id):
-    post = Post.objects.get(pk=request.data.get('postId'))
+    postId = request.data.get('postId')
+    post = Post.objects.get(pk=postId)
     post.likes.remove(request.user)
     post.save()
     post = PostSerializer(post)
     return JsonResponse({'post': post.data})
+
+
+@api_view(['POST'])
+def comment(request, id):
+    body = request.data.get('body')
+    postId = request.data.get('postId')
+    post = Post.objects.get(pk=postId)
+    comment = Comment.objects.create(body = body, created_by = request.user)
+    if comment:
+        post.comments.add(comment)
+        post.save()
+        post = PostSerializer(post)
+        return JsonResponse({'post': post.data})
+    return JsonResponse({'post': {}})
+
+
