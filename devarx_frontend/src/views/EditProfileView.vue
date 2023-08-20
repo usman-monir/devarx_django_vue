@@ -126,7 +126,5 @@ export default {
             }
         }
     }
-
-
 }
 </script>

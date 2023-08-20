@@ -1,17 +1,23 @@
 from rest_framework.decorators import api_view, authentication_classes
-from .models import Post, Comment
+from .models import Post, Comment, Trend
 from account.models import User
 from .forms import CreatePostForm
 from django.http import JsonResponse
-from .serializers import PostSerializer, UserSerializer
+from .serializers import PostSerializer, UserSerializer, TrendSerializer
 # Create your views here.
 
 @api_view(['GET'])
 def allPosts(request):
-    all_users_ids = [str(request.user.id)]
-    for user in request.user.friends.all():
-        all_users_ids.append(str(user.id))
-    posts = Post.objects.filter(created_by_id__in=all_users_ids)
+    trend = request.GET.get('trend')
+
+    if trend:
+        posts = Post.objects.filter(body__icontains= '#' + trend)
+    else:
+        all_users_ids = [str(request.user.id)]
+        for user in request.user.friends.all():
+            all_users_ids.append(str(user.id))
+        posts = Post.objects.filter(created_by_id__in=all_users_ids)
+
     serializedPosts = PostSerializer(posts, many=True)
     return JsonResponse({'posts': serializedPosts.data})
 
@@ -98,6 +104,12 @@ def editComment(request, id):
     post = PostSerializer(post)
     return JsonResponse({'post': post.data})
 
+
+@api_view(['GET'])
+def getTrends(request):
+    trends = Trend.objects.all()
+    trends = TrendSerializer(trends, many=True)
+    return JsonResponse({'trends': trends.data})
 
 
 

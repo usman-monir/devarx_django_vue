@@ -53,7 +53,7 @@
                                         <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
                                     </svg>
                                 </div>
-                                <span class="text-xs text-gray-500 leading-none">{{ message.created_at_formatted }}</span>
+                                <span class="text-xs text-gray-500 leading-none">{{ message.created_at_formatted }} ago</span>
                             </div>
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
                                 <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
@@ -68,7 +68,7 @@
                                 <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">
                                     <p class="text-sm">{{ message.body }}</p>
                                 </div>
-                                <span class="text-xs text-gray-500 leading-none">{{ message.created_at_formatted }}</span>
+                                <span class="text-xs text-gray-500 leading-none">{{ message.created_at_formatted }} ago</span>
                             </div>
                         </div>
                     </div>

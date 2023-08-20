@@ -9,6 +9,7 @@ urlpatterns = [
     path('profile/<uuid:id>/comment/', api.comment, name='comment'),
     path('profile/<uuid:id>/comment/delete', api.deleteComment, name='deleteComment'),
     path('profile/<uuid:id>/comment/edit', api.editComment, name='editComment'),
-    path('createPost/', api.createPost, name='createPost')
+    path('createPost/', api.createPost, name='createPost'),
+    path('trends/', api.getTrends, name='getTrends')
 ]
 
