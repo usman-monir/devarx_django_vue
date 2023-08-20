@@ -24,11 +24,11 @@
                 style="min-height: 400px;max-height: 500px; overflow-y: auto;">
                 <div class="flex flex-col flex-grow p-4">
                     <div v-if="activeConversation" v-for="message in activeConversation.messages"
-                        @mouseleave.prevent="handleMouseOut">
+                        @mouseleave.prevent="handleMouseOutOnMessage">
                         <div v-if="message.sent_by.id == userStore.user.id"
                             class="flex w-full mt-2 space-x-3 max-w-md ml-auto justify-end">
                             <div class="w-full">
-                                <div @mouseenter="handleMouseOver(message)"
+                                <div @mouseenter="handleMouseEnterOnMessage(message)"
                                     class="bg-purple-400 text-white p-3 rounded-l-lg rounded-br-lg">
                                     <p class="text-sm">{{ message.body }}</p>
                                 </div>
@@ -72,6 +72,12 @@
                             </div>
                         </div>
                     </div>
+                    <div v-if="activeConversation?.messages?.length == 0">
+                        <div v-if="true" class="text-gray-500 text-center">
+                            <p>No conversation yet :(</p>
+                            <p><small><strong>Tip:</strong> Hover the messages to edit or delete them.</small></p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -112,15 +118,11 @@ export default {
     },
     mounted() {
         let activeConversation = undefined;
-        if(this.$route.query.activeConversation != undefined)
-        {
+        if (this.$route.query.activeConversation != undefined) {
             activeConversation = JSON.parse(this.$route.query.activeConversation)
         }
-        if(activeConversation)
-        {
-            console.log(activeConversation, 'from mounted');
+        if (activeConversation) {
             this.setActiveConversation(activeConversation)
-            console.log(this.activeConversation, 'from mounted2');
         }
         this.loadConversations()
     },
@@ -128,43 +130,35 @@ export default {
         isProxyEmpty(proxy) {
             for (const prop in proxy) {
                 if (proxy.hasOwnProperty(prop)) {
-                return false; // Proxy has at least one property
+                    return false; // Proxy has at least one property
                 }
             }
             return true; // Proxy has no properties
-            },
+        },
         loadConversations() {
             axios
                 .get('/api/chat/')
                 .then(response => {
-                    console.log(response.data);
                     this.conversations = response.data.conversations;
-                    console.log(this.activeConversation);
-                    if(!this.isProxyEmpty(this.activeConversation))
-                    {
+                    if (!this.isProxyEmpty(this.activeConversation)) {
                         this.loadMessagesForActiveConversation()
                         this.moveScrollBarOfMessageBox()
                         return;
                     }
-                    else if(this.isProxyEmpty(this.activeConversation))
-                    {
+                    else if (this.isProxyEmpty(this.activeConversation)) {
                         if (this.conversations.length) {
                             {
                                 this.setActiveConversation(this.conversations[0])
-                                console.log('redirected from other page');
                             }
                             this.loadMessagesForActiveConversation()
                             this.moveScrollBarOfMessageBox()
                         }
-                        else
-                        {
+                        else {
                             this.toast.showToast(5000, 'No Chats Available Yet!!', 'bg-orange-300')
                         }
                     }
-                    else
-                    {
-                        console.log('redirecting');
-                        this.$router.push({ name: 'chat', query: {'activeConversation': undefined}});
+                    else {
+                        this.$router.push({ name: 'chat', query: { 'activeConversation': undefined } });
                     }
                 })
                 .catch((err) => this.toast.showToast(3000, "Couldn't load conversations", 'bg-red-300'))
@@ -175,10 +169,9 @@ export default {
                 .then(response => {
                     this.activeConversation = response.data.activeConversation
                     this.moveScrollBarOfMessageBox()
-                    console.log(this.activeConversation, 'from load active conversation');
                 })
                 .catch(() => {
-                    this.$router.push({name: 'chat', query: {'activeConversation': undefined}})
+                    this.$router.push({ name: 'chat', query: { 'activeConversation': undefined } })
                     this.toast.showToast(3000, 'Something went wrong.. Cannot load messages!!', 'bg-red-300')
                 })
         },
@@ -186,7 +179,6 @@ export default {
             return users[0].id == this.userStore.user.id ? users[1] : users[0]
         },
         setActiveConversation(conversation) {
-            console.log(conversation, 'from set active conversation');
             this.activeConversation = conversation
             this.activeUser = this.getOtherUser(conversation.users)
             this.loadMessagesForActiveConversation()
@@ -202,18 +194,12 @@ export default {
                 await axios
                     .post(`/api/chat/${this.activeConversation.id}/sendMessage/`, { 'messageBody': this.messageBody, 'sent_to': this.activeUser.id })
                     .then(response => {
-                        console.log(response.data.message, 'send');
-                        if(this.activeConversation)
-                        {
+                        if (this.activeConversation) {
                             this.activeConversation.messages.push(response.data.message)
-                            console.log(this.activeConversation, 'send ok');
                         }
-                        else
-                        {
+                        else {
                             this.activeConversation = undefined;
-                            console.log('undefined', this.activeConversation);
                         }
-                        console.log(this.activeConversation, 'send');
                         this.messageBody = ''
                     })
                     .catch(() => this.toast.showToast(3000, 'Something went wrong.. Cannot send message!!', 'bg-red-300'))
@@ -224,26 +210,24 @@ export default {
             }
         }
         ,
-        handleMouseOver(message) {
+        handleMouseEnterOnMessage(message) {
             document.getElementById(message.id + '-mssgTooltip').style.display = 'block';
             this.message = message;
         },
-        handleMouseOut() {
+        handleMouseOutOnMessage() {
             let mssgTooltip = document.getElementById(this.message.id + '-mssgTooltip')
             if (mssgTooltip)
                 mssgTooltip.style.display = 'none';
-        }
-        , deleteMessage() {
+        },
+        deleteMessage() {
             axios
                 .post(`/api/chat/${this.activeConversation.id}/deleteMessage/`, { 'messageId': this.message.id })
                 .then(response => {
                     this.activeConversation.messages = response.data.messages
                     this.toast.showToast(2000, 'Message deleted successfully!!', 'bg-emerald-300')
-                    this.handleMouseOut()
+                    this.handleMouseOutOnMessage()
                 })
                 .catch(() => this.toast.showToast(3000, 'Something went wrong..Cannot delete message!!', 'bg-red-300'))
-
-
         },
         toggleMessageEditSection() {
             this.setEditMessageValues()
@@ -259,8 +243,7 @@ export default {
                 sendMessageInput.style.display = "block";
                 editMessageInput.style.display = "none";
             }
-        }
-        ,
+        },
         setEditMessageValues() {
             this.editMessageBody = this.message.body;
             this.editMessageId = this.message.id;
@@ -280,20 +263,19 @@ export default {
                 .then(response => {
                     this.activeConversation.messages = response.data.messages
                     this.toast.showToast(2000, 'Message Updated successfully!!', 'bg-emerald-300')
-                    this.handleMouseOut()
+                    this.handleMouseOutOnMessage()
                     this.toggleMessageEditSection()
                     this.setEditMessageValuesToDefault()
                 })
                 .catch(() => this.toast.showToast(3000, 'Something went wrong..Cannot update message!!', 'bg-red-300'))
 
         },
-        moveScrollBarOfMessageBox()
-        {
+        moveScrollBarOfMessageBox() {
             this.$nextTick(() => {
-                        const messageBox = document.getElementById('messageBox');
-                        if (messageBox) {
-                            messageBox.scrollTop = messageBox.scrollHeight;
-                        }
+                const messageBox = document.getElementById('messageBox');
+                if (messageBox) {
+                    messageBox.scrollTop = messageBox.scrollHeight;
+                }
             });
         }
     }
