@@ -3,13 +3,15 @@
         <div class="main-center col-span-2 space-y-4">
             <div class="bg-white border border-gray-200 rounded-lg">
                 <div class="p-4">
-                    <textarea v-model="postData.body" class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What are you thinking about?"></textarea>
+                    <textarea v-model="postData.body" class="p-4 w-full bg-gray-100 rounded-lg"
+                        placeholder="What are you thinking about?"></textarea>
                 </div>
 
                 <div class="p-4 border-t border-gray-100 flex justify-between">
                     <a href="#" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">Attach image</a>
 
-                    <a href="#" @click.prevent="createPost" class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</a>
+                    <a href="#" @click.prevent="createPost"
+                        class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</a>
                 </div>
             </div>
 
@@ -53,7 +55,7 @@
                 </div>
             </div> -->
             <template v-for="post in posts" :key="post.id">
-                <PostItem :post="post" :current_user_id="userStore.user.id"/>
+                <PostItem :post="post" :current_user_id="userStore.user.id" />
             </template>
         </div>
 
@@ -72,57 +74,54 @@ import Trends from '@/components/Trends.vue';
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
 
-export default{
+export default {
     name: 'FeedView',
     components: {
         PeopleYouMayKnow,
         PostItem,
         Trends,
     },
-    setup()
-    {
+    setup() {
         const toastStore = useToastStore()
         const userStore = useUserStore()
-        return{
+        return {
             toastStore,
             userStore
         }
     },
     data() {
         return {
-            posts:[],
-            postData:{
+            posts: [],
+            postData: {
                 'body': ''
             }
         }
     },
-    mounted(){
+    mounted() {
         this.loadPosts()
     },
-    methods:{
-        loadPosts()
-        {
+    methods: {
+        loadPosts() {
             axios
-            .get('/api/posts/')
-            .then(response=>{
-                this.posts = response.data.posts
-        })
-        .catch(err => this.toastStore.showToast(5000,err, 'bg-red-300'))
-       },
-       createPost()
-       {
+                .get('/api/posts/')
+                .then(response => {
+                    this.posts = response.data.posts
+                })
+                .catch(err => this.toastStore.showToast(5000, err, 'bg-red-300'))
+        },
+        createPost() {
             axios
-            .post('/api/posts/createPost/', this.postData)
-            .then(response => {
-                const newPost= response.data.newPost
-                if (newPost)
-                    this.posts.unshift(newPost)
-                else
-                this.toastStore.showToast(5000,'Failed to create the post!!','bg-red-300')
-                this.postData = {}
-            })
-            .catch(error => this.toastStore.showToast(5000,error,'bg-red-300'))
-       }
-}
+                .post('/api/posts/createPost/', this.postData)
+                .then(response => {
+                    const newPost = response.data.newPost
+                    if (newPost)
+                        this.posts.unshift(newPost)
+                    else
+                        this.toastStore.showToast(5000, 'Failed to create the post!!', 'bg-red-300')
+                    this.postData = {}
+                })
+                .catch(error => this.toastStore.showToast(5000, error, 'bg-red-300'))
+        }
+    }
 }
 </script>

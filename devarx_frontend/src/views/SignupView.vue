@@ -10,7 +10,8 @@
                 </p>
 
                 <p class="font-bold">
-                    Already have an account? <RouterLink :to="{'name': 'login'}" class="underline">Click here</RouterLink> to log in!
+                    Already have an account? <RouterLink :to="{ 'name': 'login' }" class="underline">Click here</RouterLink>
+                    to log in!
                 </p>
             </div>
         </div>
@@ -20,22 +21,26 @@
                 <form class="space-y-6" @submit.prevent="submitForm">
                     <div>
                         <label>Name</label><br>
-                        <input v-model="form.name" type="text" placeholder="Your full name" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                        <input v-model="form.name" type="text" placeholder="Your full name"
+                            class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
                     <div>
                         <label>E-mail</label><br>
-                        <input v-model="form.email" type="email" placeholder="Your e-mail address" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                        <input v-model="form.email" type="email" placeholder="Your e-mail address"
+                            class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
                     <div>
                         <label>Password</label><br>
-                        <input v-model="form.password1" type="password" placeholder="Your password" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                        <input v-model="form.password1" type="password" placeholder="Your password"
+                            class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
                     <div>
                         <label>Repeat password</label><br>
-                        <input v-model="form.password2" type="password" placeholder="Repeat your password" class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
+                        <input v-model="form.password2" type="password" placeholder="Repeat your password"
+                            class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
                     <template v-if="errors.length > 0">
@@ -75,8 +80,7 @@ export default {
         }
     },
     methods: {
-        submitForm()
-        {
+        submitForm() {
             this.errors = []
             if (this.form.email === '') {
                 this.errors.push('email is required')
@@ -96,30 +100,28 @@ export default {
 
             if (this.errors.length === 0) {
                 axios.post('/api/signup/', this.form)
-                .then(response=>{
-                    if(response.data.status === 'success')
-                    {
-                        this.toastStore.showToast(5000, 'The user is registered. Please activate your account by clicking your email link.', 'bg-emerald-500')
+                    .then(response => {
+                        if (response.data.status === 'success') {
+                            this.toastStore.showToast(5000, 'The user is registered. Please activate your account by clicking your email link.', 'bg-emerald-500')
 
-                        this.form.email = ''
-                        this.form.name = ''
-                        this.form.password1 = ''
-                        this.form.password2 = ''
-                    }
-                    else
-                    {
-                        const data = JSON.parse(response.data.message)
-                        for (const key in data){
-                            this.errors.push(data[key][0].message)
+                            this.form.email = ''
+                            this.form.name = ''
+                            this.form.password1 = ''
+                            this.form.password2 = ''
                         }
+                        else {
+                            const data = JSON.parse(response.data.message)
+                            for (const key in data) {
+                                this.errors.push(data[key][0].message)
+                            }
 
-                        this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300')
-                    }
-                })
-                .catch(error => {
-                    console.log(error)
-                    this.toastStore.showToast(5000, error, 'bg-red-300')
-                })
+                            this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300')
+                        }
+                    })
+                    .catch(error => {
+                        console.log(error)
+                        this.toastStore.showToast(5000, error, 'bg-red-300')
+                    })
             }
         }
     }

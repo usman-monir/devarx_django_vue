@@ -58,7 +58,7 @@
         <div class="ml-6" id="commentInputSection">
             <div class="bg-white border border-gray-200 rounded-lg">
                 <div class="p-4 pb-0">
-                    <textarea v-model="commentBody" @keyup.prevent="handleKeyEventOnInput"
+                    <textarea v-model="commentBody" id='commentInput' @keyup.prevent="handleKeyEventOnInput"
                         class="p-4 w-full bg-gray-100 rounded-lg" placeholder="What u think about this post.."></textarea>
                 </div>
 
@@ -92,7 +92,8 @@
                             d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
                             fill="red"></path>
                     </svg>
-                    <svg v-if="current_user_id == comment.created_by.id" @click.prevent="toggleCommentEditSection(comment.id, comment.body)"
+                    <svg v-if="current_user_id == comment.created_by.id"
+                        @click.prevent="toggleCommentEditSection(comment.id, comment.body)"
                         xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
                         stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-edit-3" style="color: rgb(150, 4, 150); cursor: pointer;">
@@ -105,7 +106,7 @@
             <div class="bg-white border border-gray-200 rounded-lg" :id="comment.id + '-editComment'"
                 style="display: none;">
                 <div class="p-4 pb-0">
-                    <textarea v-model="commentBody" class="p-4 w-full bg-gray-100 rounded-lg"></textarea>
+                    <textarea v-model="commentUpdateBody" class="p-4 w-full bg-gray-100 rounded-lg"></textarea>
                 </div>
                 <div class="p-4 border-t border-gray-100 flex justify-end">
                     <button @click.prevent="updateComment(comment)"
@@ -137,6 +138,7 @@ export default {
         return {
             likesCount: 0,
             commentBody: '',
+            commentUpdateBody: '',
             mutablePost: this.post
         }
     },
@@ -264,7 +266,7 @@ export default {
                 .catch(error => this.toast.showToast(3000, `Cannot delete the comment!`, 'bg-red-300')
                 )
         },
-        toggleCommentEditSection(commentId, commentBody = '') {
+        toggleCommentEditSection(commentId, commentUpdateBody = '') {
             const editCommentSection = document.getElementById(commentId + '-editComment')
             const commentSection = document.getElementById(commentId + '-comment')
 
@@ -276,17 +278,16 @@ export default {
                 editCommentSection.style.display = 'none'
                 commentSection.style.display = 'block'
             }
-
-            if (commentBody)
-                this.commentBody = commentBody
+            this.commentBody = ''
+            if (commentUpdateBody)
+                this.commentUpdateBody = commentUpdateBody
         },
-        async updateComment(comment)
-        {
-            if (this.commentBody.trim() == '')
+        async updateComment(comment) {
+            if (this.commentUpdateBody.trim() == '')
                 this.toast.showToast(3000, `Cannot add empty comment to the ${this.mutablePost.created_by.name}'s post!!`, 'bg-orange-400')
             else {
                 await axios
-                    .post(`/api/posts/profile/${this.mutablePost.created_by.id}/comment/edit`, { 'postId': this.post.id, 'commentId': comment.id , 'body': this.commentBody.trim() })
+                    .post(`/api/posts/profile/${this.mutablePost.created_by.id}/comment/edit`, { 'postId': this.post.id, 'commentId': comment.id, 'body': this.commentUpdateBody.trim() })
                     .then(response => {
                         this.mutablePost = response.data.post;
                         this.toast.showToast(3000, `Comment updated successfully!!`, 'bg-emerald-300')

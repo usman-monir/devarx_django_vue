@@ -17,7 +17,7 @@
                 </div>
             </div>
             <div v-if="posts.length" v-for="post in posts" :key="post.id">
-                <PostItem :post="post" :current_user_id="userStore.user.id"  />
+                <PostItem :post="post" :current_user_id="userStore.user.id" />
             </div>
         </div>
         <div class="main-right col-span-1 space-y-4">
@@ -29,10 +29,10 @@
 
 <script>
 import { RouterLink } from 'vue-router';
-import PeopleYouMayKnow from '../components/PeopleYouMayKnow.vue'
-import Trends from '../components/Trends.vue'
-import PostItem from '../components/PostItem.vue';
-import UserCard from '../components/UserCard.vue';
+import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue'
+import Trends from '@/components/Trends.vue'
+import PostItem from '@/components/PostItem.vue';
+import UserCard from '@/components/UserCard.vue';
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
 import axios from 'axios'
