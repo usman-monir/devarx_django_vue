@@ -97,7 +97,7 @@ export default {
                             })
                             .catch(error => this.toastStore.showToast(5000, error, 'bg-orange-400'))
                     })
-                    .catch(error => this.toastStore.showToast(5000, error, 'bg-red-300'))
+                    .catch(() => this.toastStore.showToast(5000, 'Incorrect Email or Password', 'bg-red-300'))
             }
         }
     }

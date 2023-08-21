@@ -2,16 +2,11 @@
     <div class="max-w-7xl mx-auto grid grid-cols-2 gap-4">
         <div class="main-left">
             <div class="p-12 bg-white border border-gray-200 rounded-lg">
-                <h1 class="mb-6 text-2xl">Sign up</h1>
+                <h1 class="mb-6 text-2xl">Edit Your Profile</h1>
 
                 <p class="mb-6 text-gray-500">
                     Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
                     Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate. Lorem ipsum dolor sit mate.
-                </p>
-
-                <p class="font-bold">
-                    Already have an account? <RouterLink :to="{ 'name': 'login' }" class="underline">Click here</RouterLink>
-                    to log in!
                 </p>
             </div>
         </div>
@@ -32,14 +27,14 @@
                     </div>
 
                     <div>
-                        <label>Password</label><br>
-                        <input v-model="form.password1" type="password" placeholder="Your password"
+                        <label>Old Password</label><br>
+                        <input v-model="form.old_password" type="password" placeholder="Your Old password (optional)"
                             class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
                     <div>
-                        <label>Repeat password</label><br>
-                        <input v-model="form.password2" type="password" placeholder="Repeat your password"
+                        <label>New password</label><br>
+                        <input v-model="form.new_password" type="password" placeholder="Your New password (optional)"
                             class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
@@ -50,7 +45,7 @@
                     </template>
 
                     <div>
-                        <button class="py-4 px-6 bg-purple-600 text-white rounded-lg">Sign up</button>
+                        <button class="py-4 px-6 bg-purple-600 text-white rounded-lg">Save Changes</button>
                     </div>
                 </form>
             </div>
@@ -60,21 +55,24 @@
 <script>
 import axios from 'axios'
 import { useToastStore } from '@/stores/toast'
+import { useUserStore } from '@/stores/user'
 export default {
     setup() {
-        const toastStore = useToastStore()
+        const toast = useToastStore()
+        const userStore = useUserStore()
 
         return {
-            toastStore
+            'toast': toast,
+            'userStore': userStore
         }
     },
     data() {
         return {
             form: {
-                email: '',
-                name: '',
-                password1: '',
-                password2: ''
+                email: this.userStore.user.email,
+                name: this.userStore.user.name,
+                old_password: '',
+                new_password: ''
             },
             errors: [],
         }
@@ -90,38 +88,46 @@ export default {
                 this.errors.push('name is required')
             }
 
-            if (this.form.password1 === '') {
-                this.errors.push('password is required')
+            if (this.form.new_password  && this.form.old_password === '') {
+                this.errors.push('Enter your old password to verify!')
             }
 
-            if (this.form.password1 !== this.form.password2) {
-                this.errors.push('The password does not match!')
+            if (this.form.old_password  && this.form.new_password === '') {
+                this.errors.push('Enter your new password to change or left both password fields empty !')
+            }
+
+            if(this.form.old_password && this.form.new_password.length >=1 && this.form.new_password.length < 5)
+            {
+                this.errors.push('Your New Password must be at least of 5 characters!')
             }
 
             if (this.errors.length === 0) {
-                axios.post('/api/signup/', this.form)
+                axios.post('/api/editProfile/', this.form)
                     .then(response => {
                         if (response.data.status === 'success') {
-                            this.toastStore.showToast(5000, 'The user is registered. Please activate your account by clicking your email link.', 'bg-emerald-500')
-
-                            this.form.email = ''
-                            this.form.name = ''
-                            this.form.password1 = ''
-                            this.form.password2 = ''
-                            this.$router.push('/login/')
+                            this.toast.showToast(5000, response.data.message, 'bg-emerald-500')
+                            this.userStore.setUserInfo({
+                                id: this.userStore.user.id,
+                                name: this.form.name,
+                                email:  this.form.email,
+                            })
+                            this.$router.back()
+                        }
+                        else if (response.data.status === 'failure')
+                        {
+                            this.toast.showToast(3000, response.data.message, 'bg-red-300')
                         }
                         else {
                             const data = JSON.parse(response.data.message)
                             for (const key in data) {
                                 this.errors.push(data[key][0].message)
                             }
-
-                            this.toastStore.showToast(5000, 'Something went wrong. Please try again', 'bg-red-300')
+                            this.toast.showToast(5000, 'All conditions should be satisfied!', 'bg-red-300')
                         }
                     })
                     .catch(error => {
                         console.log(error)
-                        this.toastStore.showToast(5000, error, 'bg-red-300')
+                        this.toast.showToast(5000, error, 'bg-red-300')
                     })
             }
         }

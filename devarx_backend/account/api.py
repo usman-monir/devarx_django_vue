@@ -1,5 +1,6 @@
 from django.http import JsonResponse
 from django.db.models import Q
+from django.contrib.auth.hashers import check_password
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from .models import User, FriendRequest
 from .serializers import RequestsSerializer, UserSerializer
@@ -35,6 +36,41 @@ def signup(request):
         message = 'error'
 
     return JsonResponse({'status': message})
+
+@api_view(['POST'])
+def editProfile(request):
+    name = request.data.get('name')
+    email = request.data.get('email')
+    old_password = request.data.get('old_password')
+    new_password = request.data.get('new_password')
+    FAILURE = 'failure'
+    SUCCESS = 'success'
+    print(name, email, old_password, new_password)
+    status = SUCCESS
+    message = 'Couldn\'t update user!! Something happened unexpected!'
+
+    request.user.name = name
+    emailAlreadyExists = User.objects.exclude(id=request.user.id).filter(email=email)
+    if emailAlreadyExists:
+        status = FAILURE
+        message = 'Email already exists!'
+    else:
+        request.user.email = email
+        # check for password
+        if old_password:
+            if check_password(old_password, request.user.password):
+                request.user.set_password(new_password)
+            else:
+                status = FAILURE
+                message = 'Passwords mismatched!'
+
+    if status == SUCCESS:
+        message = 'User updated successfully'
+        request.user.save()
+    else:
+        print('user is not updated!')
+    return JsonResponse({'status': status, 'message': message})
+
 
 
 @api_view(['POST'])

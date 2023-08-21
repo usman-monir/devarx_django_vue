@@ -11,6 +11,9 @@
                         friends</RouterLink>
                     <p class="text-xs text-gray-500">{{ totalPosts }} posts</p>
                 </div>
+                <RouterLink :to="{name: 'editProfile'}" v-if="user && user.id == userStore.user.id"
+                    class="inline-block mt-4 py-3 px-3 bg-purple-600 text-white text-xs rounded-md">Edit Profile
+                </RouterLink>
                 <button v-if="user && user.id != userStore.user.id && !isAlreadyFriend" @click.prevent="sendFriendRequest"
                     class="inline-block mt-4 py-3 px-3 bg-purple-600 text-white text-xs rounded-md">Send Friend
                     Request</button>
@@ -65,11 +68,14 @@ export default {
         Trends,
         RouterLink
     },
+    props:{
+        toggleMenu: Function
+    },
     setup() {
-        const toastStore = useToastStore()
+        const toast = useToastStore()
         const userStore = useUserStore()
         return {
-            'toastStore': toastStore,
+            'toast': toast,
             'userStore': userStore
         }
     },
@@ -94,6 +100,11 @@ export default {
             immediate: true,
         }
     },
+    mounted()
+    {
+        if (document.getElementById('dropdownMenu').style.display == 'block')
+            this.toggleMenu()
+    },
     methods: {
         loadPosts() {
             axios
@@ -115,27 +126,27 @@ export default {
                     if (newPost)
                         this.posts.unshift(newPost)
                     else
-                        this.toastStore.showToast(5000, 'Failed to create the post!!', 'bg-red-300')
+                        this.toast.showToast(5000, 'Failed to create the post!!', 'bg-red-300')
                     this.postData = {}
                 })
-                .catch(error => this.toastStore.showToast(5000, error, 'bg-red-300'))
+                .catch(error => this.toast.showToast(5000, error, 'bg-red-300'))
         },
         sendFriendRequest() {
             axios
                 .post('/api/user/sendFriendRequest/', { 'id': this.user.id })
                 .then(response => {
-                    this.toastStore.showToast(5000, response.data.status, 'bg-emerald-300')
+                    this.toast.showToast(5000, response.data.status, 'bg-emerald-300')
                 })
-                .catch(error => this.toastStore.showToast(5000, error, 'bg-red-300'))
+                .catch(error => this.toast.showToast(5000, error, 'bg-red-300'))
         },
         unFriend() {
             axios
                 .post('/api/user/unFriend/', { 'id': this.user.id })
                 .then(response => {
-                    this.toastStore.showToast(5000, response.data.status, 'bg-emerald-300')
+                    this.toast.showToast(5000, response.data.status, 'bg-emerald-300')
                     this.isAlreadyFriend = 0
                 })
-                .catch(error => this.toastStore.showToast(5000, error, 'bg-red-300'))
+                .catch(error => this.toast.showToast(5000, error, 'bg-red-300'))
         },
         startConversation() {
             axios
@@ -145,7 +156,7 @@ export default {
                     console.log(activeConversation);
                     this.$router.push({name: 'chat', query: { 'activeConversation': JSON.stringify(activeConversation)} })
                 })
-                .catch(error => this.toastStore.showToast(5000, error, 'bg-red-300'))
+                .catch(error => this.toast.showToast(5000, error, 'bg-red-300'))
         }
     }
 

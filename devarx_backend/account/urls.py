@@ -12,6 +12,7 @@ urlpatterns = [
     path('user/friends/accept', api.acceptFriendRequest, name='acceptFriendRequest'),
     path('user/friends/reject', api.rejectFriendRequest, name='rejectFriendRequest'),
     path('signup/', api.signup, name='signup'),
+    path('editProfile/', api.editProfile, name='editProfile'),
     path('login/', TokenObtainPairView.as_view(), name='token_login_view'),
     path('refresh/', TokenRefreshView.as_view(), name='token_refresh_view')
 ]
