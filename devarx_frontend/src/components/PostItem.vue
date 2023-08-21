@@ -1,5 +1,5 @@
 <template>
-    <div class="p-4 bg-white border border-gray-200 rounded-lg" style="margin-bottom: 2rem; padding-bottom: 0;">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg" style="margin-bottom: 2rem; padding-bottom: 0;" :id="mutablePost.id + '-post'">
         <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center space-x-6">
                 <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] rounded-full">
@@ -18,6 +18,26 @@
             </div>
 
             <p class="text-gray-600">{{ mutablePost.created_at_formatted }} ago</p>
+            <div class="flex space-x-3">
+                <svg v-if="current_user_id == post.created_by.id" @click.prevent="deletePost()"
+                    style="color: red; cursor: pointer; min-width: 20px;" xmlns="http://www.w3.org/2000/svg" height="16"
+                    fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
+                    <path
+                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"
+                        fill="red"></path>
+                    <path fill-rule="evenodd"
+                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                        fill="red"></path>
+                </svg>
+                <svg v-if="current_user_id == post.created_by.id"
+                    @click.prevent="togglePostEditSection()"
+                    xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none"
+                    stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
+                    class="feather feather-edit-3" style="color: rgb(150, 4, 150); cursor: pointer;">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                </svg>
+            </div>
         </div>
 
         <p>{{ mutablePost.body }}</p>
@@ -94,7 +114,7 @@
                     </svg>
                     <svg v-if="current_user_id == comment.created_by.id"
                         @click.prevent="toggleCommentEditSection(comment.id, comment.body)"
-                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" fill="none"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none"
                         stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
                         class="feather feather-edit-3" style="color: rgb(150, 4, 150); cursor: pointer;">
                         <path d="M12 20h9"></path>
@@ -115,6 +135,18 @@
                         class="inline-block ml-2 text-md py-2 px-4 bg-gray-600 text-white rounded-lg">Cancel</button>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="bg-white border border-gray-200 rounded-lg" :id="mutablePost.id + '-editPost'"
+    style="display: none;">
+        <div class="p-4 pb-0">
+            <textarea v-model="postUpdateBody" class="p-4 w-full bg-gray-100 rounded-lg"></textarea>
+        </div>
+        <div class="p-4 border-t border-gray-100 flex justify-end">
+            <button @click.prevent="updatePost()"
+                class="inline-block text-md py-2 px-4 bg-purple-600 text-white rounded-lg">Update</button>
+            <button @click.prevent="togglePostEditSection()"
+                class="inline-block ml-2 text-md py-2 px-4 bg-gray-600 text-white rounded-lg">Cancel</button>
         </div>
     </div>
 </template>
@@ -139,6 +171,7 @@ export default {
             likesCount: 0,
             commentBody: '',
             commentUpdateBody: '',
+            postUpdateBody: this.post.body,
             mutablePost: this.post
         }
     },
@@ -256,6 +289,9 @@ export default {
                 <p>${comment.body}</p>`
             })
         },
+
+        // COMMENT CRUD FUNCTIONS
+
         deleteComment(commentId) {
             axios
                 .post(`/api/posts/profile/${this.mutablePost.created_by.id}/comment/delete`, { 'postId': this.post.id, 'commentId': commentId })
@@ -295,7 +331,48 @@ export default {
                     .catch(error => this.toast.showToast(3000, `Cannot edit comment!`, 'bg-red-300'))
             }
             this.toggleCommentEditSection(comment.id)
-        }
+        },
+
+        // POST CRUD FUNCTIONS
+
+        deletePost() {
+            const response = confirm('Do You want to delete this post?')
+            if (response)
+            {
+                axios
+                .post(`/api/posts/profile/${this.mutablePost.id}/post/delete`)
+                .then(response => {
+                    this.toast.showToast(2000, response.data.message, 'bg-emerald-300')
+                    setTimeout(() => {
+                        location.reload()
+                    }, 2000);
+                })
+                .catch(() => this.toast.showToast(3000, `Cannot delete the post!`, 'bg-red-300')
+                )
+            }
+        },
+        togglePostEditSection() {
+            const postSection = document.getElementById(this.mutablePost.id + '-post')
+            const editPostSection = document.getElementById(this.mutablePost.id + '-editPost')
+            if (postSection.style.display == 'none') {
+                postSection.style.display = 'block'
+                editPostSection.style.display = 'none'
+            }
+            else {
+                postSection.style.display = 'none'
+                editPostSection.style.display = 'block'
+            }
+        },
+        async updatePost() {
+            await axios
+            .post(`/api/posts/profile/${this.mutablePost.id}/post/edit`, { 'body': this.postUpdateBody })
+            .then(response => {
+                this.mutablePost = response.data.post;
+                this.toast.showToast(3000, `Post updated successfully!!`, 'bg-emerald-300')
+            })
+            .catch(() => this.toast.showToast(3000, `Cannot edit post!`, 'bg-red-300'))
+            this.togglePostEditSection()
+        },
     }
 }
 </script>

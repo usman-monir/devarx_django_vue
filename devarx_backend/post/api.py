@@ -105,11 +105,23 @@ def editComment(request, id):
     return JsonResponse({'post': post.data})
 
 
+@api_view(['POST'])
+def deletePost(request, id):
+    Post.objects.get(id=id).delete()
+    return JsonResponse({'message': 'Post deleted successfully'})
+
+@api_view(['POST'])
+def editPost(request, id):
+    post = Post.objects.get(id=id)
+    post.body = request.data.get('body')
+    post.save()
+    post = PostSerializer(post)
+    return JsonResponse({'post': post.data})
+
 @api_view(['GET'])
 def getTrends(request):
     trends = Trend.objects.all()
     trends = TrendSerializer(trends, many=True)
     return JsonResponse({'trends': trends.data})
-
 
 
