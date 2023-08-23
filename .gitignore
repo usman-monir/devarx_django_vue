@@ -27,4 +27,4 @@ coverage
 *.sln
 *.sw?
 
-./devarx_backend/media
+/devarx_backend/media
