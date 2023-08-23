@@ -18,7 +18,7 @@
             <!-- <div class="p-4 bg-white border border-gray-200 rounded-lg">
                 <div class="mb-6 flex items-center justify-between">
                     <div class="flex items-center space-x-6">
-                        <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] rounded-full">
+                        <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] h-[40px] rounded-full">
 
                         <p><strong>Code With Stein</strong></p>
                     </div>

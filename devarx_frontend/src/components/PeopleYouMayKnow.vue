@@ -6,7 +6,7 @@
             <template v-for="user in suggestedPeople" :key="user.id">
                 <div class="flex items-center justify-between" v-if="current_profile_opened != user.id">
                     <div class="flex items-center space-x-2">
-                        <img :src="user.get_avatar" class="w-[40px] rounded-full">
+                        <img :src="user.get_avatar" class="w-[40px] h-[40px] rounded-full">
 
                         <p class="text-xs"><strong>{{user.name}}</strong></p>
                     </div>

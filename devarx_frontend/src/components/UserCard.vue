@@ -1,6 +1,6 @@
 <template>
-    <div class="p-3 text-center bg-white border border-gray-300 rounded-lg">
-        <img :src="user.get_avatar" class="mb-6 p-6 rounded-full">
+    <div class="p-3 flex flex-col justify-around items-center bg-white border border-gray-300 rounded-lg">
+        <img :src="user.get_avatar" class="mb-6 w-[100px] h-[100px] rounded-full">
         <template v-if="current_user_id == user.id">
             <RouterLink :to="{ name: 'profile', params: { 'id': user.id } }">
                 <strong class="underline">
