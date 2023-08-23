@@ -4,7 +4,7 @@ from .models import User, FriendRequest
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email','friends')
+        fields = ('id', 'name', 'email', 'get_avatar', 'friends')
 
 
 class RequestsSerializer(serializers.ModelSerializer):

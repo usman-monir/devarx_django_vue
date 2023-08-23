@@ -2,8 +2,7 @@
     <div class="max-w-7xl mx-auto grid grid-cols-4 gap-4">
         <div class="main-left col-span-1">
             <div class="p-4 bg-white border border-gray-200 text-center rounded-lg">
-                <img src="https://i.pravatar.cc/300?img=67" class="mb-6 rounded-full">
-
+                <img :src="user.get_avatar" class="mb-6">
                 <p><strong>{{ user.name }}</strong></p>
 
                 <div class="mt-6 flex space-x-8 justify-around">
@@ -45,7 +44,7 @@
         </div>
 
         <div class="main-right col-span-1 space-y-4">
-            <PeopleYouMayKnow />
+            <PeopleYouMayKnow :current_profile_opened="user.id" />
             <Trends />
         </div>
     </div>
@@ -116,7 +115,7 @@ export default {
                     this.friendsCount = this.user.friends.length
                     this.totalPosts = this.posts.length
                 })
-                .catch(err => console.log(err))
+                .catch((err) => this.toast.showToast(5000, err, 'bg-red-300'))
         },
         createPost() {
             axios

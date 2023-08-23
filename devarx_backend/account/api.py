@@ -13,6 +13,7 @@ def user(request):
         'id': request.user.id,
         'name': request.user.name,
         'email': request.user.email,
+        'avatar': request.user.get_avatar()
     })
 
 
@@ -39,16 +40,23 @@ def signup(request):
 
 @api_view(['POST'])
 def editProfile(request):
+
+    # getting form data
     name = request.data.get('name')
     email = request.data.get('email')
     old_password = request.data.get('old_password')
     new_password = request.data.get('new_password')
+    avatar = request.data.get('avatar')
+
+    print(request.FILES)
+
+    # status
     FAILURE = 'failure'
     SUCCESS = 'success'
-    print(name, email, old_password, new_password)
     status = SUCCESS
     message = 'Couldn\'t update user!! Something happened unexpected!'
 
+    # saving new attributes
     request.user.name = name
     emailAlreadyExists = User.objects.exclude(id=request.user.id).filter(email=email)
     if emailAlreadyExists:
@@ -64,12 +72,15 @@ def editProfile(request):
                 status = FAILURE
                 message = 'Passwords mismatched!'
 
+    if avatar:
+        request.user.avatar = avatar
+
     if status == SUCCESS:
         message = 'User updated successfully'
         request.user.save()
     else:
         print('user is not updated!')
-    return JsonResponse({'status': status, 'message': message})
+    return JsonResponse({'status': status, 'message': message, 'avatar': request.user.get_avatar()})
 
 
 
@@ -137,3 +148,11 @@ def getViewedUserFriendsData(request, user_id):
     friends = UserSerializer(friends, many=True)
     mutualFriends = UserSerializer(mutualFriends, many=True)
     return JsonResponse({'friends': friends.data, 'mutualFriends': mutualFriends.data })
+
+
+@api_view(['GET'])
+def suggestedPeople(request):
+    friends = request.user.friends.all()
+    suggestedPeople = User.objects.exclude(pk__in=friends).exclude(pk=request.user.id)[:5]
+    suggestedPeople = UserSerializer(suggestedPeople, many=True)
+    return JsonResponse({'suggestedPeople': suggestedPeople.data})

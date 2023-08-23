@@ -87,7 +87,6 @@ export default {
                         this.userStore.setToken(response.data)
                         axios.defaults.headers.common['Authorization'] = "Bearer " + response.data.access
 
-
                         axios
                             .get('/api/user/')
                             .then(response => {

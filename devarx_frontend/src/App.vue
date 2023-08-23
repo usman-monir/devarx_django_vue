@@ -41,16 +41,12 @@
                             </svg>
                         </RouterLink>
                     </div>
-                    <!-- <p class="mr-3 mt-2">{{ this.userStore.user.name }}</p>
-                    <RouterLink :to="{ name: 'profile', params: { 'id': userStore.user.id } }">
-                        <img src="https://i.pravatar.cc/40?img=62" class="rounded-full">
-                    </RouterLink> -->
 
                     <div class="flex menu-right">
                         <button id="dropdownMenuButton" @click.prevent="toggleMenu"
                             class="flex items-center text-sm font-medium rounded-full text-purple-800 md:mr-0"
                             type="button">
-                            <img class="w-8 h-8 mr-2 rounded-full" src="https://i.pravatar.cc/40?img=62" alt="user photo">
+                            <img class="w-8 h-8 mr-2 rounded-full" :src="userStore.user.avatar" alt="user photo">
                             {{ userStore.user.name }}
                             <svg class="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                                 fill="none" viewBox="0 0 10 6">

@@ -38,6 +38,11 @@
                             class="w-full mt-2 py-4 px-6 border border-gray-200 rounded-lg">
                     </div>
 
+                    <div>
+                        <label>Add Avatar</label><br>
+                        <input type="file" ref="avatar" class="mt-3"/>
+                    </div>
+
                     <template v-if="errors.length > 0">
                         <div class="bg-red-300 text-white rounded-lg p-6">
                             <p v-for="error in errors" :key="error">{{ error }}</p>
@@ -72,7 +77,8 @@ export default {
                 email: this.userStore.user.email,
                 name: this.userStore.user.name,
                 old_password: '',
-                new_password: ''
+                new_password: '',
+                avatar: null,
             },
             errors: [],
         }
@@ -102,7 +108,8 @@ export default {
             }
 
             if (this.errors.length === 0) {
-                axios.post('/api/editProfile/', this.form)
+                this.form.avatar = this.$refs.avatar.files[0]
+                axios.post('/api/editProfile/', this.form, { 'headers': { 'Content-Type': 'multipart/form-data'}})
                     .then(response => {
                         if (response.data.status === 'success') {
                             this.toast.showToast(5000, response.data.message, 'bg-emerald-500')
@@ -110,6 +117,7 @@ export default {
                                 id: this.userStore.user.id,
                                 name: this.form.name,
                                 email:  this.form.email,
+                                avatar: response.data.avatar,
                             })
                             this.$router.back()
                         }

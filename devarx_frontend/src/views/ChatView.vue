@@ -9,7 +9,7 @@
                     <div class="space-y-4">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center space-x-4">
-                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
+                                <img :src="getOtherUser(conversation.users).get_avatar" class="w-[40px] rounded-full">
                                 <p class="text-xs"><strong>{{ getOtherUser(conversation.users).name }}</strong></p>
                             </div>
                             <span class="text-xs pl-4 text-gray-500">{{ conversation.created_at_formatted }}</span>
@@ -56,13 +56,12 @@
                                 <span class="text-xs text-gray-500 leading-none">{{ message.created_at_formatted }} ago</span>
                             </div>
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
+                                <img :src="userStore.user.avatar" class="w-[40px] rounded-full">
                             </div>
                         </div>
-
-                        <div v-if="message.sent_to.id == userStore.user.id" class="flex w-full mt-2 space-x-3 max-w-md">
+                        <div v-else class="flex w-full mt-2 space-x-3 max-w-md">
                             <div class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300">
-                                <img src="https://i.pravatar.cc/300?img=70" class="w-[40px] rounded-full">
+                                <img :src="message.sent_by.get_avatar" class="w-[40px] rounded-full">
                             </div>
                             <div>
                                 <div class="bg-gray-300 p-3 rounded-r-lg rounded-bl-lg">

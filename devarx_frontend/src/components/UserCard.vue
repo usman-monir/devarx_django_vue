@@ -1,6 +1,6 @@
 <template>
-    <div class="p-3 text-center bg-gray-100 rounded-lg">
-        <img src="https://i.pravatar.cc/300?img=67" class="mb-6 p-4 rounded-full">
+    <div class="p-3 text-center bg-white border border-gray-300 rounded-lg">
+        <img :src="user.get_avatar" class="mb-6 p-6 rounded-full">
         <template v-if="current_user_id == user.id">
             <RouterLink :to="{ name: 'profile', params: { 'id': user.id } }">
                 <strong class="underline">

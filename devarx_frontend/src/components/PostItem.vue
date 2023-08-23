@@ -2,7 +2,7 @@
     <div class="p-4 bg-white border border-gray-200 rounded-lg" style="margin-bottom: 2rem; padding-bottom: 0;" :id="mutablePost.id + '-post'">
         <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center space-x-6">
-                <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] rounded-full">
+                <img :src="mutablePost.created_by.get_avatar" class="w-[40px] rounded-full">
                 <template v-if="current_user_id == mutablePost.created_by.id">
                     <p><strong>{{ mutablePost.created_by.name }}</strong></p>
                 </template>
@@ -92,7 +92,7 @@
             class="ml-6 my-3 p-4 bg-white border border-gray-200 rounded-lg">
             <div class="flex flex-col justify-between" :id="comment.id + '-comment'">
                 <div class="mb-6 flex items-center space-x-12">
-                    <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] rounded-full">
+                    <img :src="comment.created_by.get_avatar" class="w-[40px] rounded-full">
                     <template v-if="current_user_id === comment.created_by.id">
                         <p><strong>{{ comment.created_by.name }}</strong></p>
                     </template>
@@ -230,7 +230,7 @@ export default {
                 this.mutablePost.likes.map(likedBy => {
                     dropdownMenu.innerHTML += `
                             <li class='flex items-center justify-start px-2 py-2 hover:bg-white'>
-                                <img class="w-8 h-8 rounded-full" src="https://i.pravatar.cc/40?img=62" alt="user photo">
+                                <img class="w-8 h-8 rounded-full" src="${likedBy.get_avatar}" alt="user photo">
                                 <a href="/profile/${likedBy.id}" class="block px-6 underline"><small>${likedBy.name}</small></a>
                             </li>`
                 })

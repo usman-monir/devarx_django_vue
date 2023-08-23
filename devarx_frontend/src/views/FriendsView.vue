@@ -7,7 +7,7 @@
                     <div class="p-6 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-4">
                         <div v-for="request in friendRequests" :key="request.id">
                             <div class="p-3 text-center bg-gray-100 rounded-lg">
-                                <img src="https://i.pravatar.cc/300?img=67" class="mb-6 p-4 rounded-full">
+                                <img :src="request.send_by.get_avatar" class="mb-6 p-4 rounded-full">
                                 <RouterLink :to="{ name: 'profile', params: { 'id': request.send_by.id } }">
                                     <strong class="text-purple-600 underline">{{ request.send_by.name }}
                                     </strong>
