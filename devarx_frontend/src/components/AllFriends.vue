@@ -1,7 +1,7 @@
 <template>
     <div v-for="friend in friends" :key="friend.id">
-        <div class="p-3 text-center bg-gray-100 rounded-lg">
-            <img :src="friend.get_avatar" class="mb-6 p-4 rounded-full">
+        <div class="p-4 flex flex-col justify-around items-center bg-gray-100 rounded-lg">
+            <img :src="friend.get_avatar" class="mb-6 w-[120px] h-[120px] rounded-full">
             <template v-if="current_user_id == friend.id">
                 <RouterLink :to="{ name: 'profile', params: { 'id': friend.id } }">
                     <strong class="underline">You

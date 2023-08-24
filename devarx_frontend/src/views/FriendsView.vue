@@ -6,8 +6,8 @@
                     <h1 class="font-bold p-5 bg-white text-gray-700 rounded-full ">Friend Requests</h1>
                     <div class="p-6 bg-white border border-gray-200 rounded-lg grid grid-cols-3 gap-4">
                         <div v-for="request in friendRequests" :key="request.id">
-                            <div class="p-3 text-center bg-gray-100 rounded-lg">
-                                <img :src="request.send_by.get_avatar" class="mb-6 p-4 rounded-full">
+                            <div class="p-3 flex flex-col justify-around items-center bg-gray-100 rounded-lg">
+                                <img :src="request.send_by.get_avatar" class="mb-6  w-[120px] h-[120px] rounded-full">
                                 <RouterLink :to="{ name: 'profile', params: { 'id': request.send_by.id } }">
                                     <strong class="text-purple-600 underline">{{ request.send_by.name }}
                                     </strong>
@@ -122,6 +122,9 @@ export default {
                     this.toastStore.showToast(3000, response.data.status, 'bg-emerald-300')
                 })
                 .catch(error => this.toastStore.showToast(3000, error, 'bg-red-300'))
+                setTimeout(()=>{
+                    window.location.reload()
+                },3000)
         },
         rejectRequest(id) {
             axios
@@ -130,6 +133,9 @@ export default {
                     this.toastStore.showToast(3000, response.data.status, 'bg-red-300')
                 })
                 .catch(error => this.toastStore.showToast(3000, error, 'bg-red-300'))
+                setTimeout(()=>{
+                    window.location.reload()
+                },3000)
         }
     }
 }

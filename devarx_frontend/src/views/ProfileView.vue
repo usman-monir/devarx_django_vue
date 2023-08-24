@@ -25,21 +25,11 @@
         </div>
 
         <div class="main-center col-span-2 space-y-4">
-            <div v-if="userStore.user.id == user.id" class="bg-white border border-gray-200 rounded-lg">
-                <div class="p-4">
-                    <textarea v-model="postData.body" class="p-4 w-full bg-gray-100 rounded-lg"
-                        placeholder="What are you thinking about?"></textarea>
-                </div>
-
-                <div class="p-4 border-t border-gray-100 flex justify-between">
-                    <a href="#" class="inline-block py-4 px-6 bg-gray-600 text-white rounded-lg">Attach image</a>
-
-                    <a @click.prevent="createPost"
-                        class="inline-block py-4 px-6 bg-purple-600 text-white rounded-lg">Post</a>
-                </div>
-            </div>
+            <template v-if="user.id==userStore.user.id && posts && totalPosts">
+                <CreatePost :posts="posts" @post-created="totalPosts++" />
+            </template>
             <template v-for="post in posts" :key="post.id">
-                <PostItem :post="post" :current_user_id="userStore.user.id" :profileViewPage=true />
+                <PostItem :post="post" :current_user_id="userStore.user.id" :profileViewPage=true @post-deleted="()=>{ posts = posts.filter(p=>p != post ); totalPosts--}" />
             </template>
         </div>
 
@@ -55,6 +45,7 @@ import axios from 'axios';
 import PeopleYouMayKnow from '@/components/PeopleYouMayKnow.vue';
 import PostItem from '@/components/PostItem.vue';
 import Trends from '@/components/Trends.vue';
+import CreatePost from '@/components/CreatePost.vue';
 import { useToastStore } from '@/stores/toast';
 import { useUserStore } from '@/stores/user';
 import { RouterLink } from 'vue-router';
@@ -62,6 +53,7 @@ import { RouterLink } from 'vue-router';
 export default {
     name: 'ProfileView',
     components: {
+        CreatePost,
         PeopleYouMayKnow,
         PostItem,
         Trends,
@@ -70,6 +62,7 @@ export default {
     props:{
         toggleMenu: Function
     },
+    emits:['post-deleted', 'post-created'],
     setup() {
         const toast = useToastStore()
         const userStore = useUserStore()
@@ -81,9 +74,6 @@ export default {
     data() {
         return {
             posts: [],
-            postData: {
-                'body': ''
-            },
             user: {},
             isAlreadyFriend: 0,
             friendsCount: 0,
@@ -116,19 +106,6 @@ export default {
                     this.totalPosts = this.posts.length
                 })
                 .catch((err) => this.toast.showToast(5000, err, 'bg-red-300'))
-        },
-        createPost() {
-            axios
-                .post('/api/posts/createPost/', this.postData)
-                .then(response => {
-                    const newPost = response.data.newPost
-                    if (newPost)
-                        this.posts.unshift(newPost)
-                    else
-                        this.toast.showToast(5000, 'Failed to create the post!!', 'bg-red-300')
-                    this.postData = {}
-                })
-                .catch(error => this.toast.showToast(5000, error, 'bg-red-300'))
         },
         sendFriendRequest() {
             axios

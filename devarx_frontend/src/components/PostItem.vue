@@ -4,7 +4,7 @@
             <div class="flex items-center space-x-6">
                 <img :src="mutablePost.created_by.get_avatar" class="w-[40px] h-[40px] rounded-full">
                 <template v-if="current_user_id == mutablePost.created_by.id">
-                    <p><strong>{{ mutablePost.created_by.name }}</strong></p>
+                    <p><strong>You</strong></p>
                 </template>
                 <template v-else-if="profileViewPage">
                     <p><strong>{{ mutablePost.created_by.name }}</strong></p>
@@ -84,7 +84,7 @@
 
                 <div class="p-4 border-t border-gray-100 flex justify-end">
                     <button @click.prevent="postComment"
-                        class="inline-block text-md py-2 px-4 bg-purple-600 text-white rounded-lg">Comment</button>
+                        class="inline-block text-md py-2 px-4 bg-purple-500 text-white rounded-lg">Comment</button>
                 </div>
             </div>
         </div>
@@ -94,7 +94,7 @@
                 <div class="mb-6 flex items-center space-x-12">
                     <img :src="comment.created_by.get_avatar" class="w-[40px] h-[40px] rounded-full">
                     <template v-if="current_user_id === comment.created_by.id">
-                        <p><strong>{{ comment.created_by.name }}</strong></p>
+                        <p><strong>You</strong></p>
                     </template>
                     <template v-else>
                         <RouterLink :to="{ name: 'profile', params: { 'id': comment.created_by.id } }">
@@ -161,6 +161,7 @@ export default {
             'toast': toast
         }
     },
+    emits: ['post-deleted'],
     props: {
         post: Object,
         current_user_id: String,
@@ -204,7 +205,6 @@ export default {
                     .then(response => {
                         likeBtn.style.fill = 'purple';
                         this.mutablePost = response.data.post
-                        console.log(this.mutablePost);
                     })
                     .catch(err => alert(err))
             }
@@ -214,7 +214,6 @@ export default {
                     .then(response => {
                         likeBtn.style.fill = 'none';
                         this.mutablePost = response.data.post
-                        console.log(this.mutablePost);
                     })
                     .catch(err => alert(err))
             }
@@ -263,31 +262,6 @@ export default {
         handleKeyEventOnInput(e) {
             if (e.key == 'Enter' && !e.shiftKey)
                 this.postComment()
-        },
-        insertCommentToHtml() {
-            const commentSection = document.getElementById(this.mutablePost.id + '-commentSection')
-            this.mutablePost.comments.map(comment => {
-                commentSection.innerHTML += `
-                <div class="mb-6 flex items-center justify-between">
-                    <div class="flex items-center space-x-6">
-                        <img src="https://i.pravatar.cc/300?img=67" class="w-[40px] h-[40px] rounded-full">
-                        <template v-if="${this.current_user_id == this.mutablePost.created_by.id}">
-                            <p><strong>${comment.created_by.name}</strong></p>
-                        </template>
-                        <template v-else-if="${true}">
-                            <p><strong>${comment.created_by.name}</strong></p>
-                        </template>
-                        <template v-else>
-                            <RouterLink :to="{ name: 'profile', params: { 'id': comment.created_by.id } }">
-                                <strong class="text-purple-600">${comment.created_by.name}
-                                </strong>
-                            </RouterLink>
-                        </template>
-                    </div>
-                    <p class="text-gray-600">${comment.created_at_formatted} ago</p>
-                </div>
-                <p>${comment.body}</p>`
-            })
         },
 
         // COMMENT CRUD FUNCTIONS
@@ -343,9 +317,7 @@ export default {
                 .post(`/api/posts/profile/${this.mutablePost.id}/post/delete`)
                 .then(response => {
                     this.toast.showToast(2000, response.data.message, 'bg-emerald-300')
-                    setTimeout(() => {
-                        location.reload()
-                    }, 2000);
+                    this.$emit('post-deleted')
                 })
                 .catch(() => this.toast.showToast(3000, `Cannot delete the post!`, 'bg-red-300')
                 )
