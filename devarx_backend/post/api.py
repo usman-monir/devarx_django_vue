@@ -1,7 +1,7 @@
 from rest_framework.decorators import api_view, authentication_classes
 from .models import Post, Comment, Trend
 from account.models import User
-from .forms import CreatePostForm
+from .forms import CreatePostForm, PostAttachmentForm
 from django.http import JsonResponse
 from .serializers import PostSerializer, UserSerializer, TrendSerializer
 # Create your views here.
@@ -24,16 +24,25 @@ def allPosts(request):
 
 @api_view(['POST'])
 def createPost(request):
-    data = request.data
-    form = CreatePostForm(data)
-    if form.is_valid():
-        newPost = form.save(commit=False)
+    attachment= None
+    postForm = CreatePostForm(request.POST)
+    attachmentForm = PostAttachmentForm(request.POST, request.FILES)
+
+    if attachmentForm.is_valid():
+        attachment = attachmentForm.save(commit=False)
+        attachment.created_by = request.user
+        attachment.save()
+
+    if postForm.is_valid():
+        newPost = postForm.save(commit=False)
         newPost.created_by = request.user
         newPost.save()
-        serializedPosts = PostSerializer(newPost)
-        return JsonResponse({'newPost': serializedPosts.data})
-    else:
-        return JsonResponse({'newPost': None})
+
+    if attachment:
+        newPost.attachments.add(attachment)
+
+    serializedPosts = PostSerializer(newPost)
+    return JsonResponse({'newPost': serializedPosts.data})
 
 
 @api_view(['GET'])
@@ -107,7 +116,11 @@ def editComment(request, id):
 
 @api_view(['POST'])
 def deletePost(request, id):
-    Post.objects.get(id=id).delete()
+    post = Post.objects.get(id=id)
+    attachment = post.attachments.all()
+    if attachment:
+        attachment.delete()
+    post.delete()
     return JsonResponse({'message': 'Post deleted successfully'})
 
 @api_view(['POST'])

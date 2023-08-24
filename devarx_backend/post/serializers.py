@@ -20,7 +20,7 @@ class PostSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
     likes = UserSerializer(many=True)
     comments = CommentSerializer(many=True)
-    attachments = PostAttachmentSerializer()
+    attachments = PostAttachmentSerializer(read_only=True, many=True)
     class Meta:
         model = Post
         fields = ('id', 'body', 'created_at_formatted', 'created_by', 'likes', 'comments', 'attachments',)

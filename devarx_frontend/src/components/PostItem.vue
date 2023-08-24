@@ -1,5 +1,5 @@
 <template>
-    <div class="p-4 bg-white border border-gray-200 rounded-lg" style="margin-bottom: 2rem; padding-bottom: 0;" :id="mutablePost.id + '-post'">
+    <div class="p-4 bg-white border border-gray-200 rounded-lg" style="margin-bottom: 2rem; padding-bottom: 0; max-width: 700px;" :id="mutablePost.id + '-post'">
         <div class="mb-6 flex items-center justify-between">
             <div class="flex items-center space-x-6">
                 <img :src="mutablePost.created_by.get_avatar" class="w-[40px] h-[40px] rounded-full">
@@ -40,7 +40,10 @@
             </div>
         </div>
 
-        <p>{{ mutablePost.body }}</p>
+        <p class="text-lg">{{ mutablePost.body }}</p>
+        <div v-if="mutablePost.attachments.length" class="flex flex-col items-center justify-center">
+            <img v-for="image in mutablePost.attachments" v-bind:key="image.id" :src="image.get_image" class="w-[400px] my-4 rounded-xl">
+        </div>
 
         <div class="mb-6 mt-8 flex justify-between">
             <div class="flex space-x-6">

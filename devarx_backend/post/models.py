@@ -1,7 +1,10 @@
 import uuid
+import os
 from django.db import models
 from django.utils.timesince import timesince
 from account.models import User
+from django.db.models.signals import pre_delete
+from django.dispatch import receiver
 
 
 # Create your models here.
@@ -33,6 +36,12 @@ class PostAttachment(models.Model):
         else:
             return ''
 
+    def delete_image_file(self):
+        if self.image:
+            if os.path.isfile(self.image.path):
+                print(self.image.path, 'delete image file')
+                os.remove(self.image.path)
+
 
 class Post(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -61,3 +70,8 @@ class Trend(models.Model):
 
     def __str__(self):
         return f'{self.hashtag} - {self.occurences}'
+
+
+@receiver(pre_delete, sender=PostAttachment)
+def delete_post_image(sender, instance, **kwargs):
+    instance.delete_image_file()
